@@ -3,7 +3,7 @@ const waveSurfer = require("wavesurfer.js")
 
 exports.create = function (config) {
   return function () {
-    return waveSurfer.create(Object.assign(config, {backend: "MediaElement" }))
+    return waveSurfer.create(Object.assign(config, { backend: "MediaElement" }))
   }
 }
 
@@ -22,5 +22,13 @@ exports.pause = function (ws) {
 exports.destroy = function (ws) {
   return function () {
     ws.destroy()
+  }
+}
+
+exports.load = function (url) {
+  return function (ws) {
+    return function () {
+      ws.load(url)
+    }
   }
 }
