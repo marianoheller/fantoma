@@ -11,7 +11,6 @@ import Web.File.File as File
 import Web.File.FileList as FileList
 import Web.HTML.HTMLInputElement as HTMLInputElement
 
-
 mkFileUpload :: Component {}
 mkFileUpload = do
   component "FileUploadComponent" \_ -> React.do
@@ -25,7 +24,7 @@ mkFileUpload = do
       $ fragment
           [ R.input
               { type: "file"
-              , multiple: true
+              , accept: ".mp3,audio/*"
               , onChange: handler currentTarget handleChange
               }
           , R.pre_
