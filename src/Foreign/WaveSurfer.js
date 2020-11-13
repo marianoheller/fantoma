@@ -3,7 +3,8 @@ const waveSurfer = require("wavesurfer.js")
 
 exports.create = function (config) {
   return function () {
-    return waveSurfer.create(Object.assign(config, { backend: "MediaElement" }))
+    /* TODO: move defaults to PS */
+    return waveSurfer.create(Object.assign(config, { pixelRatio: 1, responsive: true }))
   }
 }
 
