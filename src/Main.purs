@@ -16,23 +16,15 @@ import Web.HTML.HTMLDocument (body)
 import Web.HTML.HTMLElement (toElement)
 import Web.HTML.Window (document)
 
-url :: String
-url = "https://file-examples-com.github.io/uploads/2017/11/file_example_MP3_700KB.mp3"
-
-onFileUpload :: String -> Effect Unit
-onFileUpload blobUrl = do
-  log $ "GOT BLOB: " <> blobUrl
-  pure unit
-
 mkApp :: Component {}
 mkApp = do
   player <- mkPlayer
   fileUpload <- mkFileUpload
-  component "Clock" \props -> React.do
-    blobUrl /\ setBlobUrl <- useState' url -- TODO: state shuold be Maybe String
+  component "App" \props -> React.do
+    blobUrl /\ setBlobUrl <- useState' (Nothing :: Maybe String)
     pure
       $ DOM.div_
-          [ (player { url: blobUrl })
+          [ (player { murl: blobUrl })
           , fileUpload { onFileUpload: setBlobUrl }
           ]
 

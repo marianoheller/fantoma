@@ -1,22 +1,20 @@
 module Components.Player where
 
 import Prelude
-
 import Data.Maybe (Maybe(..))
 import Data.Nullable (notNull, null)
-import Effect.Class.Console (log)
 import Foreign.WaveSurfer as WS
 import React.Basic.DOM as DOM
-import React.Basic.Hooks (Component, component, readRefMaybe, useEffect, useRef, writeRef)
+import React.Basic.Hooks (Component, component, readRefMaybe, useEffect, useRef, writeRef, (/\))
 import React.Basic.Hooks as React
 import Web.DOM.Element (fromNode)
 
 type PlayerProps
-  = { url :: String }
+  = { murl :: Maybe String }
 
 mkPlayer :: Component PlayerProps
 mkPlayer = do
-  component "Surfer" \{ url } -> React.do
+  component "Player" \{ murl } -> React.do
     divRef <- useRef null
     wsRef <- useRef null
     useEffect unit do
@@ -27,13 +25,12 @@ mkPlayer = do
           ws <- WS.create { container: ele }
           writeRef wsRef $ notNull ws
           pure (WS.destroy ws)
-    useEffect url do
+    useEffect murl do
       mws <- readRefMaybe wsRef
-      log $ "URL -> " <> url
-      case mws of
-        Nothing -> pure (pure unit)
-        Just ws -> do
+      case mws /\ murl of
+        Just ws /\ Just url-> do
           WS.load url ws
           pure (pure unit)
+        _ -> pure (pure unit)
     pure
       $ DOM.div { ref: divRef }

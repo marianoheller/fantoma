@@ -20,6 +20,18 @@ exports.pause = function (ws) {
   }
 }
 
+exports.playPause = function (ws) {
+  return function () {
+    ws.playPause()
+  }
+}
+
+exports.stop = function (ws) {
+  return function () {
+    ws.stop()
+  }
+}
+
 exports.destroy = function (ws) {
   return function () {
     ws.destroy()
