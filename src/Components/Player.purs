@@ -8,13 +8,14 @@ import React.Basic.DOM as DOM
 import React.Basic.Hooks (Component, component, readRefMaybe, useEffect, useRef, writeRef, (/\))
 import React.Basic.Hooks as React
 import Web.DOM.Element (fromNode)
+import Slice as S
 
 type PlayerProps
-  = { murl :: Maybe String }
+  = { murl :: Maybe String, status :: S.Status }
 
 mkPlayer :: Component PlayerProps
 mkPlayer = do
-  component "Player" \{ murl } -> React.do
+  component "Player" \{ murl, status } -> React.do
     divRef <- useRef null
     wsRef <- useRef null
     useEffect unit do
@@ -28,7 +29,7 @@ mkPlayer = do
     useEffect murl do
       mws <- readRefMaybe wsRef
       case mws /\ murl of
-        Just ws /\ Just url-> do
+        Just ws /\ Just url -> do
           WS.load url ws
           pure (pure unit)
         _ -> pure (pure unit)
