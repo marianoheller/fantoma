@@ -45,3 +45,13 @@ exports.load = function (url) {
     }
   }
 }
+
+exports.on = function (event) {
+  return function (cb) {
+    return function (ws) {
+      return function () {
+        ws.on(event, (...args) => cb(...args)())
+      }
+    }
+  }
+}
