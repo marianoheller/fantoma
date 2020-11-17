@@ -13,6 +13,8 @@ type WaveSurferConfig
 
 foreign import create :: WaveSurferConfig -> Effect WaveSurfer
 
+foreign import playRegion :: WaveSurfer -> Effect Unit
+
 foreign import play :: WaveSurfer -> Effect Unit
 
 foreign import pause :: WaveSurfer -> Effect Unit

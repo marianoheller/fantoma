@@ -42,7 +42,7 @@ mkPlayer = do
       mws <- readRefMaybe wsRef
       case mws /\ status of
         Just ws /\ S.Playing -> do
-          WS.play ws
+          WS.playRegion ws
           pure (pure unit)
         Just ws /\ S.Stopped -> do
           WS.stop ws

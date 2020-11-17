@@ -9,7 +9,8 @@
   "scripts": {
     "build": "spago build",
     "dev": "parcel public/index.html --open",
-    "build-prod": "mkdir -p prod && cp public/index.html prod/ && rm -rf dist && spago bundle-app --to prod/index.js && parcel build prod/index.html"
+    "build-prod": "mkdir -p prod && cp public/index.html prod/ && rm -rf dist && spago bundle-app --to prod/index.js && parcel build prod/index.html",
+    "test": "spago -x spago.test.dhall test"
   },
   "author": "",
   "license": "ISC",
