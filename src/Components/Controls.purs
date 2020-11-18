@@ -6,12 +6,10 @@ import React.Basic.DOM as DOM
 import React.Basic.DOM.Events (currentTarget)
 import React.Basic.Events (handler)
 import React.Basic.Hooks (Component, component, fragment)
-import Slice as S
 
 type ControlsProps
   = { onPlay :: Effect Unit
     , onStop :: Effect Unit
-    , status :: S.Status
     }
 
 mkControls :: Component ControlsProps

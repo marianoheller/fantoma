@@ -1,39 +1,65 @@
 module Slice where
 
 import Prelude
-import Data.Generic.Rep (class Generic)
-import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe(..))
 
+-- State
+data AppState
+  = NotInitialized
+  | Initialized InternalState
+
+type InternalState
+  = { audioUrl :: Maybe String
+    , status :: AppStatus
+    , playbackOption :: PlaybackOption
+    }
+
+data PlaybackOption
+  = PlaybackVoice
+  | PlaybackAudio
+  | NoPlayback
+
+data AppStatus
+  = Iddle
+  | Niddle Status
+
+derive instance eqAppStatus :: Eq AppStatus
+
 data Status
-  = Playing
-  | Stopped
-  | Paused
-
-derive instance genericStatus :: Generic Status _
-
-instance showStatus :: Show Status where
-  show = genericShow
+  = AudioPlaying
+  | AudioPaused
+  | VoiceRecording
+  | VoicePlaying
 
 derive instance eqStatus :: Eq Status
 
-type AppState
-  = { audioUrl :: Maybe String
-    , status :: Status
-    }
+initialState :: AppState
+initialState = NotInitialized
 
+initialInternalState :: InternalState
+initialInternalState =
+  { audioUrl: Nothing
+  , status: Iddle
+  , playbackOption: NoPlayback
+  }
+
+-- Actions
 data AppAction
   = SetAudioUrl (Maybe String)
-  | Play
-  | Stop
-  | Pause
+  | PlayAudio
+  | StopAudio
+  | PauseAudio
 
-initialState :: AppState
-initialState = { audioUrl: Nothing, status: Stopped }
-
+-- Reducer
 reducer :: AppState -> AppAction -> AppState
-reducer state action = case action of
-  SetAudioUrl url -> state { audioUrl = url, status = Stopped }
-  Play -> state { status = Playing }
-  Stop -> state { status = Stopped }
-  Pause -> state { status = Paused }
+reducer (NotInitialized) action = case action of
+  SetAudioUrl (Just url) -> Initialized $ initialInternalState { audioUrl = Just url }
+  _ -> NotInitialized
+
+reducer (Initialized state) action =
+  Initialized
+    $ case action of
+        SetAudioUrl url -> state { audioUrl = url, status = Iddle }
+        PlayAudio -> state { status = Niddle AudioPlaying }
+        StopAudio -> state { status = Iddle }
+        PauseAudio -> state { status = Niddle AudioPaused }

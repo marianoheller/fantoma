@@ -37,3 +37,6 @@ onFinish = on "finish"
 
 onPause :: (Unit -> Effect Unit) -> WaveSurfer -> Effect Unit
 onPause = on "pause"
+
+onRegionFinish :: (Unit -> Effect Unit) -> WaveSurfer -> Effect Unit
+onRegionFinish = on "region-out"

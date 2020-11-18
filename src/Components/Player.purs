@@ -1,6 +1,7 @@
 module Components.Player where
 
 import Prelude
+
 import Data.Maybe (Maybe(..))
 import Data.Nullable (notNull, null)
 import Effect (Effect)
@@ -13,7 +14,7 @@ import Web.DOM.Element (fromNode)
 
 type PlayerProps
   = { murl :: Maybe String
-    , status :: S.Status
+    , status :: S.AppStatus
     , onSeek :: Number -> Effect Unit
     , onFinish :: Effect Unit
     , onRegionFinish :: Effect Unit
@@ -33,7 +34,7 @@ mkPlayer = do
           ws <- WS.create { container: ele }
           _ <- WS.onSeek onSeek ws
           _ <- WS.onFinish (\_ -> onFinish) ws
-          _ <- WS.onPause (\_ -> onRegionFinish) ws
+          _ <- WS.onRegionFinish (\_ -> onRegionFinish) ws
           writeRef wsRef $ notNull ws
           pure (WS.destroy ws)
     -- on url change
@@ -48,13 +49,13 @@ mkPlayer = do
     useEffect status do
       mws <- readRefMaybe wsRef
       case mws /\ status of
-        Just ws /\ S.Playing -> do
+        Just ws /\ S.Niddle S.AudioPlaying -> do
           WS.playRegion ws
           pure (pure unit)
-        Just ws /\ S.Stopped -> do
+        Just ws /\ S.Iddle -> do
           WS.stop ws
           pure (pure unit)
-        Just ws /\ S.Paused -> do
+        Just ws /\ S.Niddle S.AudioPaused -> do
           WS.pause ws
           pure (pure unit)
         _ -> pure (pure unit)
