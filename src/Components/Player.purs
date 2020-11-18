@@ -15,13 +15,16 @@ type PlayerProps
   = { murl :: Maybe String
     , status :: S.Status
     , onSeek :: Number -> Effect Unit
+    , onFinish :: Effect Unit
+    , onRegionFinish :: Effect Unit
     }
 
 mkPlayer :: Component PlayerProps
 mkPlayer = do
-  component "Player" \{ murl, status, onSeek } -> React.do
+  component "Player" \{ murl, status, onSeek, onFinish, onRegionFinish} -> React.do
     divRef <- useRef null
     wsRef <- useRef null
+    -- on mount
     useEffect unit do
       mElem <- ((=<<) fromNode) <$> (readRefMaybe divRef)
       case mElem of
@@ -29,8 +32,11 @@ mkPlayer = do
         Just ele -> do
           ws <- WS.create { container: ele }
           _ <- WS.onSeek onSeek ws
+          _ <- WS.onFinish (\_ -> onFinish) ws
+          _ <- WS.onPause (\_ -> onRegionFinish) ws
           writeRef wsRef $ notNull ws
           pure (WS.destroy ws)
+    -- on url change
     useEffect murl do
       mws <- readRefMaybe wsRef
       case mws /\ murl of
@@ -38,6 +44,7 @@ mkPlayer = do
           WS.load url ws
           pure (pure unit)
         _ -> pure (pure unit)
+    -- on player status change
     useEffect status do
       mws <- readRefMaybe wsRef
       case mws /\ status of

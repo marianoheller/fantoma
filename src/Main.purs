@@ -34,6 +34,8 @@ mkApp = do
                   case _ of
                     0.0 -> dispatch S.Stop
                     _ -> dispatch S.Pause
+              , onFinish: dispatch S.Stop
+              , onRegionFinish: dispatch S.Stop
               }
           , fileUpload
               { onFileUpload: dispatch <<< S.SetAudioUrl

@@ -6,6 +6,9 @@ exports.create = function (config) {
     const defaults = {
       pixelRatio: 1,
       responsive: true,
+      barWidth: 2,
+      barHeight: 1,
+      barGap: 1,
       plugins: [
         RegionsPlugin.create({
           regions: [],

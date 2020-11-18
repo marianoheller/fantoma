@@ -31,3 +31,9 @@ foreign import on :: forall a. String -> (a -> Effect Unit) -> WaveSurfer -> Eff
 
 onSeek :: (Number -> Effect Unit) -> WaveSurfer -> Effect Unit
 onSeek = on "seek"
+
+onFinish :: (Unit -> Effect Unit) -> WaveSurfer -> Effect Unit
+onFinish = on "finish"
+
+onPause :: (Unit -> Effect Unit) -> WaveSurfer -> Effect Unit
+onPause = on "pause"
