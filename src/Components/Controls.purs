@@ -15,18 +15,14 @@ type ControlsProps
 mkControls :: Component ControlsProps
 mkControls = do
   component "Controls" \{ onPlay, onStop } -> React.do
-    let
-      onPlayClick = \_ -> onPlay
-
-      onStopClick = \_ -> onStop
     pure
       $ fragment
           [ DOM.button
-              { onClick: handler currentTarget onPlayClick
+              { onClick: handler currentTarget (\_ -> onPlay)
               , children: [ DOM.text "Play" ]
               }
           , DOM.button
-              { onClick: handler currentTarget onStopClick
+              { onClick: handler currentTarget (\_ -> onStop)
               , children: [ DOM.text "Stop" ]
               }
           ]

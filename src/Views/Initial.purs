@@ -18,7 +18,7 @@ mkInitialView = do
   component "Initial" \{ dispatch } -> React.do
     pure
       $ DOM.div_
-          [ DOM.text "LOAD FILE"
+          [ DOM.text "Initial view"
           , fileUpload
               { onFileUpload: dispatch <<< S.SetAudioUrl
               }
