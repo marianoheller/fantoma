@@ -3,19 +3,17 @@ module Views.Initial (mkInitialView) where
 import Prelude
 
 import Components.FileUpload (mkFileUpload)
-import Effect (Effect)
+import Context (AppContext)
 import React.Basic.DOM as DOM
-import React.Basic.Hooks (Component, component)
+import React.Basic.Hooks (Component, ReactContext, component, useContext, (/\))
+import React.Basic.Hooks as React
 import Slice as S
 
-type InitialViewProps = {
-  dispatch :: S.AppAction -> Effect Unit
-}
-
-mkInitialView :: Component InitialViewProps
-mkInitialView = do
+mkInitialView :: ReactContext AppContext -> Component Unit
+mkInitialView appContext = do
   fileUpload <- mkFileUpload
-  component "Initial" \{ dispatch } -> React.do
+  component "Initial" \_ -> React.do
+    _ /\ dispatch <- useContext appContext
     pure
       $ DOM.div_
           [ DOM.text "Initial view"

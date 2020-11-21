@@ -1,12 +1,19 @@
 module Slice where
 
 import Prelude
+import Data.Generic.Rep (class Generic)
+import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe(..))
 
 -- State
 data AppState
   = NotInitialized
   | Initialized InternalState
+
+derive instance genericAppState :: Generic AppState _
+
+instance showAppState :: Show AppState where
+  show = genericShow
 
 type InternalState
   = { audioUrl :: Maybe String
@@ -19,9 +26,19 @@ data PlaybackOption
   | PlaybackAudio
   | NoPlayback
 
+derive instance genericPlaybackOption :: Generic PlaybackOption _
+
+instance showPlaybackOption :: Show PlaybackOption where
+  show = genericShow
+
 data AppStatus
   = Iddle
   | Niddle Status
+
+derive instance genericAppStatus :: Generic AppStatus _
+
+instance showAppStatus :: Show AppStatus where
+  show = genericShow
 
 derive instance eqAppStatus :: Eq AppStatus
 
@@ -30,6 +47,11 @@ data Status
   | AudioPaused
   | VoiceRecording
   | VoicePlaying
+
+derive instance genericStatus :: Generic Status _
+
+instance showStatus :: Show Status where
+  show = genericShow
 
 derive instance eqStatus :: Eq Status
 
@@ -49,6 +71,11 @@ data AppAction
   | PlayAudio
   | StopAudio
   | PauseAudio
+
+derive instance genericAppAction :: Generic AppAction _
+
+instance showAppAction :: Show AppAction where
+  show = genericShow
 
 -- Reducer
 reducer :: AppState -> AppAction -> AppState
