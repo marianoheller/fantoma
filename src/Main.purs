@@ -1,12 +1,12 @@
 module Main where
 
 import Prelude
-import Context (AppContext, mkAppContext, mkStoreProvider)
+import Store (storeContext, mkStoreProvider)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Exception (throw)
 import React.Basic.DOM (render)
-import React.Basic.Hooks (Component, ReactContext, component, fragment, useContext, (/\))
+import React.Basic.Hooks (Component, component, fragment, useContext, (/\))
 import React.Basic.Hooks as React
 import Slice (AppState(..))
 import Views.Home (mkHomeView)
@@ -16,12 +16,12 @@ import Web.HTML.HTMLDocument (body)
 import Web.HTML.HTMLElement (toElement)
 import Web.HTML.Window (document)
 
-mkInnerApp :: ReactContext AppContext -> Component Unit
-mkInnerApp appContext = do
-  initialView <- mkInitialView appContext
-  homeView <- mkHomeView appContext
+mkInnerApp :: Component Unit
+mkInnerApp = do
+  initialView <- mkInitialView
+  homeView <- mkHomeView
   component "InnerApp" \props -> React.do
-    appState /\ _ <- useContext appContext
+    appState /\ _ <- useContext storeContext
     pure
       $ fragment
           [ case appState of
@@ -31,9 +31,8 @@ mkInnerApp appContext = do
 
 mkApp :: Component Unit
 mkApp = do
-  appContext <- mkAppContext
-  storeProvider <- mkStoreProvider appContext
-  innerApp <- mkInnerApp appContext
+  storeProvider <- mkStoreProvider
+  innerApp <- mkInnerApp
   component "App" \props -> React.do
     pure $ storeProvider [ innerApp unit ]
 
