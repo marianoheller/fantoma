@@ -31,6 +31,8 @@ derive instance genericPlaybackOption :: Generic PlaybackOption _
 instance showPlaybackOption :: Show PlaybackOption where
   show = genericShow
 
+derive instance eqPlaybackOption :: Eq PlaybackOption
+
 data AppStatus
   = Iddle
   | Niddle Status
@@ -71,6 +73,7 @@ data AppAction
   | PlayAudio
   | StopAudio
   | PauseAudio
+  | SetPlaybackOption PlaybackOption
 
 derive instance genericAppAction :: Generic AppAction _
 
@@ -90,3 +93,4 @@ reducer (Initialized state) action =
         PlayAudio -> state { status = Niddle AudioPlaying }
         StopAudio -> state { status = Iddle }
         PauseAudio -> state { status = Niddle AudioPaused }
+        SetPlaybackOption option -> state { playbackOption = option }
