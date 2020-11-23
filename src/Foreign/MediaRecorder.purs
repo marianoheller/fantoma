@@ -7,6 +7,9 @@ import Foreign.MediaStream (MediaStream)
 
 foreign import data MediaRecorder :: Type
 
+instance eqMediaRecorder :: Eq MediaRecorder where
+  eq _ _ = true
+
 foreign import newMediaRecorder :: MediaStream -> MediaRecorder
 
 foreign import start :: Int -> MediaRecorder -> Effect Unit

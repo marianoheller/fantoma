@@ -1,10 +1,13 @@
 module Views.Home where
 
 import Prelude
+
 import Components.Controls (mkControls)
 import Components.FileUpload (mkFileUpload)
 import Components.PlaybackOptions (mkPlaybackOptions)
 import Components.Player (mkPlayer)
+import Components.VoiceRecorder (mkVoiceRecorder)
+import Effect.Class.Console (warn)
 import React.Basic.DOM as DOM
 import React.Basic.Hooks (Component, component, empty, useContext, (/\))
 import React.Basic.Hooks as React
@@ -18,6 +21,7 @@ mkHomeView = do
   fileUpload <- mkFileUpload
   controls <- mkControls
   playbackOptions <- mkPlaybackOptions
+  voiceRecorder <- mkVoiceRecorder
   component "Home" \_ -> React.do
     appState /\ dispatch <- useContext storeContext
     pure
@@ -45,5 +49,9 @@ mkHomeView = do
               , playbackOptions
                   { onChange: dispatch <<< S.SetPlaybackOption
                   , currentValue: state.playbackOption
+                  }
+              , voiceRecorder
+                  { onRecordingStart: pure unit
+                  , onRecordingFinish: \str -> warn $ "GOT BLOB" <> str
                   }
               ]

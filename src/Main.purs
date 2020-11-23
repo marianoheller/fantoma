@@ -1,7 +1,6 @@
 module Main where
 
 import Prelude
-import Store (storeContext, mkStoreProvider)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Exception (throw)
@@ -9,6 +8,7 @@ import React.Basic.DOM (render)
 import React.Basic.Hooks (Component, component, fragment, useContext, (/\))
 import React.Basic.Hooks as React
 import Slice (AppState(..))
+import Store (storeContext, mkStoreProvider)
 import Views.Home (mkHomeView)
 import Views.Initial (mkInitialView)
 import Web.HTML (window)
