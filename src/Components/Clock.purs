@@ -1,18 +1,13 @@
 module Components.Clock (mkClock) where
 
 import Prelude
-import Data.JSDate (JSDate)
+
+import Hooks.CurrentTime (getTime, useCurrentTime)
 import Data.JSDate as JSDate
-import Data.Newtype (class Newtype)
-import Effect (Effect)
-import Effect.Timer (clearInterval, setInterval)
 import Math (cos, sin, tau)
 import React.Basic.DOM.SVG as SVG
-import React.Basic.Hooks (Component, Hook, JSX, UseEffect, UseState, coerceHook, component, useEffectOnce, useState', (/\))
+import React.Basic.Hooks (Component, JSX, component)
 import React.Basic.Hooks as React
-
-type Time
-  = { hours :: Number, minutes :: Number, seconds :: Number }
 
 mkClock :: Component {}
 mkClock = do
@@ -50,24 +45,3 @@ hand width length turns =
       , strokeWidth: show width
       , strokeLinecap: "round"
       }
-
-newtype UseCurrentTime hooks
-  = UseCurrentTime (UseEffect Unit (UseState Time hooks))
-
-derive instance ntUseCurrentTime :: Newtype (UseCurrentTime hooks) _
-
-useCurrentTime :: Time -> Hook UseCurrentTime Time
-useCurrentTime initialTime =
-  coerceHook React.do
-    currentTime /\ setCurrentTime <- useState' initialTime
-    useEffectOnce do
-      intervalId <- setInterval 1000 (JSDate.now >>= getTime >>= setCurrentTime)
-      pure (clearInterval intervalId)
-    pure currentTime
-
-getTime :: JSDate -> Effect Time
-getTime date = ado
-  hours <- JSDate.getHours date
-  minutes <- JSDate.getMinutes date
-  seconds <- JSDate.getSeconds date
-  in { hours, minutes, seconds }
