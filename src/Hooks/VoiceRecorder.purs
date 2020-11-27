@@ -2,7 +2,6 @@ module Hooks.VoiceRecorder where
 
 import Prelude
 import Data.Array (reverse, (:))
-import Data.Foldable (for_)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Effect (Effect)
