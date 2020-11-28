@@ -11,9 +11,9 @@ import Slice (AppState(..))
 import Store (storeContext, mkStoreProvider)
 import Views.Home (mkHomeView)
 import Views.Initial (mkInitialView)
+import Web.DOM.NonElementParentNode (getElementById)
 import Web.HTML (window)
-import Web.HTML.HTMLDocument (body)
-import Web.HTML.HTMLElement (toElement)
+import Web.HTML.HTMLDocument (toNonElementParentNode)
 import Web.HTML.Window (document)
 
 mkInnerApp :: Component Unit
@@ -38,9 +38,9 @@ mkApp = do
 
 main :: Effect Unit
 main = do
-  mBody <- body =<< document =<< window
-  case mBody of
+  mContainer <- getElementById "root" =<< (toNonElementParentNode <$> (document =<< window))
+  case mContainer of
     Nothing -> throw "Could not find body."
-    Just b -> do
+    Just container -> do
       app <- mkApp
-      render (app unit) (toElement b)
+      render (app unit) container

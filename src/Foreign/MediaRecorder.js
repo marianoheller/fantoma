@@ -10,18 +10,21 @@ exports.start = function (timeslice) {
       mediaRecorder.start(timeslice);
     };
   };
-}
+};
 
 exports.stop = function (mediaRecorder) {
   return function () {
-    mediaRecorder.stop();
+    try {
+      mediaRecorder.stop();
+    } catch (err) {
+      console.error(err);
+    }
   };
 };
 
 exports.state = function (mediaRecorder) {
   return mediaRecorder.state;
 };
-
 
 exports.requestData = function (mediaRecorder) {
   return function () {

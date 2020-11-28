@@ -1,6 +1,7 @@
 module Hooks.VoiceRecorder where
 
 import Prelude
+
 import Data.Array (reverse, (:))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
@@ -19,7 +20,7 @@ data LocalAction
   = StartRecording
   | StopRecording
   | SetIdle
-  | ClearMMR
+  | CleanUp String
   | OnData BlobEvent
   | SetMediaRecorder (Maybe MediaRecorder)
 
@@ -48,7 +49,7 @@ reducer =
         StartRecording -> s { status = Recording, chunks = [] }
         StopRecording -> s { status = Stopping }
         SetIdle -> s { status = Idle }
-        ClearMMR -> s { mmr = Nothing }
+        CleanUp url -> s { mmr = Nothing, murl = Just url }
         SetMediaRecorder mmr -> s { mmr = mmr }
 
 type VoiceRecorderStuff
@@ -79,7 +80,7 @@ useVoiceRecorder =
           liftEffect $ dispatch SetIdle
         Idle /\ Just mr -> do
           url <- liftEffect <<< createObjectURLFromBlobs <<< reverse $ state.chunks
-          liftEffect $ dispatch ClearMMR
+          liftEffect $ dispatch $ CleanUp url
         _ -> pure unit
     pure
       { mUrl: state.murl
