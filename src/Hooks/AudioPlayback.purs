@@ -1,14 +1,13 @@
 module Hooks.AudioPlayback where
 
 import Prelude
-import Data.Foldable (for_)
+import Data.Foldable (for_, sequence_, traverse_)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
 import Data.Nullable (Nullable, null)
 import Effect (Effect)
-import Effect.Class.Console (warn)
 import Effect.Unsafe (unsafePerformEffect)
 import React.Basic.DOM (render)
 import React.Basic.DOM as DOM
@@ -81,25 +80,14 @@ useAudioPlayback =
     useEffect state.murl do
       initializeAudioElement audioRef dispatch
       mElem <- ((=<<) E.fromNode) <$> (readRefMaybe audioRef)
-      pure
-        $ for_ mElem \elem ->
-            for_ state.murl \url ->
-              E.setAttribute "src" url elem
+      for_ mElem \elem -> do
+        for_ state.murl \url -> do
+          E.setAttribute "src" url elem
+      pure $ pure unit
     useEffect state.status do
       case state.status of
-        Playing -> do
-          warn $ "attempt playing  " <> (show state.murl)
-          mMediaElement <- getMediaElement audioRef
-          for_ mMediaElement \me -> do
-            warn "playing"
-            MediaElement.play me
-        Stopped -> do
-          mMediaElement <- getMediaElement audioRef
-          warn "attempt stopping "
-          for_ mMediaElement \me -> do
-                warn "STOPPED"
-                MediaElement.pause me
-                MediaElement.setCurrentTime 0.0 me
+        Playing -> (traverse_ MediaElement.play) =<< getMediaElement audioRef
+        Stopped -> (traverse_ stop) =<< getMediaElement audioRef
       pure $ pure unit
     pure
       { mUrl: state.murl
@@ -115,9 +103,9 @@ initializeAudioElement audioRef dispatch = do
   case mAudioNodeInitialized of
     Just _ -> pure unit
     Nothing -> do
-      doc <- (map toDocument) <<< document =<< window
-      container <- createElement "div" doc
-      mBodyHEle <- body =<< document =<< window
+      doc <- document =<< window
+      container <- createElement "div" (toDocument doc)
+      mBodyHEle <- body doc
       mElemNode <- readRefMaybe audioRef
       for_ mBodyHEle \bodyHEle -> do
         _ <- appendChild (E.toNode container) (HE.toNode bodyHEle)
@@ -136,3 +124,6 @@ getMediaElement audioRef = do
   case AudioElement.toHTMLMediaElement <$> (AudioElement.fromHTMLElement =<< mElem) of
     Nothing -> pure Nothing
     Just mediaElement -> pure $ Just mediaElement
+
+stop :: HTMLMediaElement -> Effect Unit
+stop = sequence_ <<< flap [ MediaElement.pause, MediaElement.setCurrentTime 0.0 ]

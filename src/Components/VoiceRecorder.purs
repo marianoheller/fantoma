@@ -1,6 +1,7 @@
 module Components.VoiceRecorder (mkVoiceRecorder) where
 
 import Prelude
+
 import Effect (Effect)
 import Hooks.AudioPlayback (useAudioPlayback)
 import Hooks.VoiceRecorder (useVoiceRecorder)
