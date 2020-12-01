@@ -29,6 +29,10 @@ foreign import load :: String -> WaveSurfer -> Effect Unit
 
 foreign import on :: forall a. String -> (a -> Effect Unit) -> WaveSurfer -> Effect Unit
 
+foreign import setZoom :: Number -> WaveSurfer -> Effect Unit
+
+foreign import minPxPerSec :: WaveSurfer -> Number
+
 onSeek :: (Number -> Effect Unit) -> WaveSurfer -> Effect Unit
 onSeek = on "seek"
 

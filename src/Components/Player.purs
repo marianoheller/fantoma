@@ -2,12 +2,13 @@ module Components.Player where
 
 import Prelude
 
+import Data.Foldable (for_)
 import Data.Maybe (Maybe(..))
 import Data.Nullable (notNull, null)
 import Effect (Effect)
 import Foreign.WaveSurfer as WS
 import React.Basic.DOM as DOM
-import React.Basic.Hooks (Component, component, readRefMaybe, useEffect, useRef, writeRef, (/\))
+import React.Basic.Hooks (Component, component, readRefMaybe, useEffect, useRef, useState, writeRef, (/\))
 import React.Basic.Hooks as React
 import Slice as S
 import Web.DOM.Element (fromNode)
@@ -25,18 +26,19 @@ mkPlayer = do
   component "Player" \{ murl, status, onSeek, onFinish, onRegionFinish} -> React.do
     divRef <- useRef null
     wsRef <- useRef null
+    minPxPerSec /\ setMinPxPerSec <- useState 0.0
     -- on mount
     useEffect unit do
       mElem <- ((=<<) fromNode) <$> (readRefMaybe divRef)
-      case mElem of
-        Nothing -> pure (pure unit)
-        Just ele -> do
-          ws <- WS.create { container: ele }
-          _ <- WS.onSeek onSeek ws
-          _ <- WS.onFinish (\_ -> onFinish) ws
-          _ <- WS.onRegionFinish (\_ -> onRegionFinish) ws
-          writeRef wsRef $ notNull ws
-          pure (WS.destroy ws)
+      for_ mElem \ele -> do
+        ws <- WS.create { container: ele }
+        WS.onSeek onSeek ws
+        WS.onFinish (\_ -> onFinish) ws
+        WS.onRegionFinish (\_ -> onRegionFinish) ws
+        writeRef wsRef $ notNull ws
+      pure do
+        mws <- readRefMaybe wsRef
+        for_ mws \ws -> WS.destroy ws
     -- on url change
     useEffect murl do
       mws <- readRefMaybe wsRef

@@ -6,9 +6,6 @@ exports.create = function (config) {
     const defaults = {
       pixelRatio: 1,
       responsive: true,
-      barWidth: 2,
-      barHeight: 1,
-      barGap: 1,
       plugins: [
         RegionsPlugin.create({
           regions: [],
@@ -91,4 +88,16 @@ exports.on = function (event) {
       };
     };
   };
+};
+
+exports.setZoom = function (n) {
+  return function (ws) {
+    return function () {
+      ws.zoom(n);
+    };
+  };
+};
+
+exports.minPxPerSec = function (ws) {
+  return ws.params.minPxPerSec;
 };
