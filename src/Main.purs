@@ -16,11 +16,11 @@ import Web.HTML (window)
 import Web.HTML.HTMLDocument (toNonElementParentNode)
 import Web.HTML.Window (document)
 
-mkInnerApp :: Component Unit
-mkInnerApp = do
+mkApp :: Component Unit
+mkApp = do
   initialView <- mkInitialView
   homeView <- mkHomeView
-  component "InnerApp" \props -> React.do
+  component "App" \props -> React.do
     appState /\ _ <- useContext storeContext
     pure
       $ fragment
@@ -29,12 +29,12 @@ mkInnerApp = do
               Initialized _ -> homeView unit
           ]
 
-mkApp :: Component Unit
-mkApp = do
+mkWrappedApp :: Component Unit
+mkWrappedApp = do
   storeProvider <- mkStoreProvider
-  innerApp <- mkInnerApp
-  component "App" \props -> React.do
-    pure $ storeProvider [ innerApp unit ]
+  app <- mkApp
+  component "WrappedApp" \props -> React.do
+    pure $ storeProvider [ app unit ]
 
 main :: Effect Unit
 main = do
@@ -42,5 +42,5 @@ main = do
   case mContainer of
     Nothing -> throw "Could not find body."
     Just container -> do
-      app <- mkApp
+      app <- mkWrappedApp
       render (app unit) container

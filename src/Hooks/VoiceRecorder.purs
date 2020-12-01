@@ -64,6 +64,7 @@ newtype UseVoiceRecorder hooks
 
 derive instance ntUseVoiceRecorder :: Newtype (UseVoiceRecorder hooks) _
 
+-- TODO: Fix all liftEffects and use useEffect AND useAff
 useVoiceRecorder :: Hook UseVoiceRecorder VoiceRecorderStuff
 useVoiceRecorder =
   coerceHook React.do
