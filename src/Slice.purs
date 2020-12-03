@@ -3,12 +3,16 @@ module Slice where
 import Prelude
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
+import Data.Lens (Lens', Prism', lens', preview, prism')
 import Data.Maybe (Maybe(..))
+import Data.Tuple (Tuple(..))
 
 -- State
 data AppState
   = NotInitialized
   | Initialized InternalState
+
+derive instance eqAppState :: Eq AppState
 
 derive instance genericAppState :: Generic AppState _
 
@@ -17,7 +21,7 @@ instance showAppState :: Show AppState where
 
 type InternalState
   = { audioUrl :: Maybe String
-    , status :: AppStatus
+    , appStatus :: AppStatus
     , playbackOption :: PlaybackOption
     }
 
@@ -34,8 +38,8 @@ instance showPlaybackOption :: Show PlaybackOption where
 derive instance eqPlaybackOption :: Eq PlaybackOption
 
 data AppStatus
-  = Iddle
-  | Niddle Status
+  = Idle
+  | Nidle Status
 
 derive instance genericAppStatus :: Generic AppStatus _
 
@@ -49,6 +53,7 @@ data Status
   | AudioPaused
   | VoiceRecording
   | VoicePlaying
+  | Loading
 
 derive instance genericStatus :: Generic Status _
 
@@ -63,13 +68,14 @@ initialState = NotInitialized
 initialInternalState :: InternalState
 initialInternalState =
   { audioUrl: Nothing
-  , status: Iddle
+  , appStatus: Idle
   , playbackOption: NoPlayback
   }
 
 -- Actions
 data AppAction
   = SetAudioUrl (Maybe String)
+  | FinishLoading
   | PlayAudio
   | StopAudio
   | PauseAudio
@@ -83,14 +89,41 @@ instance showAppAction :: Show AppAction where
 -- Reducer
 reducer :: AppState -> AppAction -> AppState
 reducer (NotInitialized) action = case action of
-  SetAudioUrl (Just url) -> Initialized $ initialInternalState { audioUrl = Just url }
+  SetAudioUrl (Just url) -> Initialized $ initialInternalState { audioUrl = Just url, appStatus = Nidle Loading }
   _ -> NotInitialized
 
 reducer (Initialized state) action =
   Initialized
     $ case action of
-        SetAudioUrl url -> state { audioUrl = url, status = Iddle }
-        PlayAudio -> state { status = Niddle AudioPlaying }
-        StopAudio -> state { status = Iddle }
-        PauseAudio -> state { status = Niddle AudioPaused }
+        SetAudioUrl url -> state { audioUrl = url, appStatus = Nidle Loading }
+        FinishLoading -> state { appStatus = Idle }
+        PlayAudio -> state { appStatus = Nidle AudioPlaying }
+        StopAudio -> state { appStatus = Idle }
+        PauseAudio -> state { appStatus = Nidle AudioPaused }
         SetPlaybackOption option -> state { playbackOption = option }
+
+-- Optics
+_InternalState :: Prism' AppState InternalState
+_InternalState =
+  prism' Initialized
+    $ case _ of
+        NotInitialized -> Nothing
+        Initialized a -> Just a
+
+_AppStatus :: forall r. Lens' { appStatus :: AppStatus | r } AppStatus
+_AppStatus = lens' \record -> Tuple record.appStatus (\s -> record { appStatus = s })
+
+_Status :: Prism' AppStatus Status
+_Status =
+  prism' Nidle
+    $ case _ of
+        Idle -> Nothing
+        Nidle a -> Just a
+
+-- Helpers
+getIsLoading :: AppState -> Boolean
+getIsLoading s =
+  let
+    optic = _InternalState <<< _AppStatus <<< _Status
+  in
+    preview optic s == Just Loading

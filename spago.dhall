@@ -14,6 +14,7 @@ You can edit this file as you like.
   , "react-basic-dom"
   , "react-basic-hooks"
   , "generics-rep"
+  , "profunctor-lenses"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs" ]

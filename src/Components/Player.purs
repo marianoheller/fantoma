@@ -17,13 +17,14 @@ type PlayerProps
   = { murl :: Maybe String
     , status :: S.AppStatus
     , onSeek :: Number -> Effect Unit
+    , onReady :: Effect Unit
     , onFinish :: Effect Unit
     , onRegionFinish :: Effect Unit
     }
 
 mkPlayer :: Component PlayerProps
 mkPlayer = do
-  component "Player" \{ murl, status, onSeek, onFinish, onRegionFinish} -> React.do
+  component "Player" \{ murl, status, onSeek, onReady, onFinish, onRegionFinish} -> React.do
     divRef <- useRef null
     wsRef <- useRef null
     minPxPerSec /\ setMinPxPerSec <- useState 0.0
@@ -32,6 +33,7 @@ mkPlayer = do
       mElem <- ((=<<) fromNode) <$> (readRefMaybe divRef)
       for_ mElem \ele -> do
         ws <- WS.create { container: ele }
+        WS.onReady (\_ -> onReady) ws
         WS.onSeek onSeek ws
         WS.onFinish (\_ -> onFinish) ws
         WS.onRegionFinish (\_ -> onRegionFinish) ws
@@ -51,13 +53,13 @@ mkPlayer = do
     useEffect status do
       mws <- readRefMaybe wsRef
       case mws /\ status of
-        Just ws /\ S.Niddle S.AudioPlaying -> do
+        Just ws /\ S.Nidle S.AudioPlaying -> do
           WS.playRegion ws
           pure (pure unit)
-        Just ws /\ S.Iddle -> do
+        Just ws /\ S.Idle -> do
           WS.stop ws
           pure (pure unit)
-        Just ws /\ S.Niddle S.AudioPaused -> do
+        Just ws /\ S.Nidle S.AudioPaused -> do
           WS.pause ws
           pure (pure unit)
         _ -> pure (pure unit)

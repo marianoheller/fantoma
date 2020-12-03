@@ -1,13 +1,14 @@
 module Main where
 
 import Prelude
+import Components.Spinner (mkSpinner)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Effect.Exception (throw)
 import React.Basic.DOM (render)
 import React.Basic.Hooks (Component, component, fragment, useContext, (/\))
 import React.Basic.Hooks as React
-import Slice (AppState(..))
+import Slice (AppState(..), getIsLoading)
 import Store (storeContext, mkStoreProvider)
 import Views.Home (mkHomeView)
 import Views.Initial (mkInitialView)
@@ -20,6 +21,7 @@ mkApp :: Component Unit
 mkApp = do
   initialView <- mkInitialView
   homeView <- mkHomeView
+  spinner <- mkSpinner
   component "App" \props -> React.do
     appState /\ _ <- useContext storeContext
     pure
@@ -27,6 +29,7 @@ mkApp = do
           [ case appState of
               NotInitialized -> initialView unit
               Initialized _ -> homeView unit
+          , spinner { isLoading: getIsLoading appState }
           ]
 
 mkWrappedApp :: Component Unit

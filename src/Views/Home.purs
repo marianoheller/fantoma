@@ -31,11 +31,12 @@ mkHomeView = do
             DOM.div_
               [ player
                   { murl: state.audioUrl
-                  , status: state.status
+                  , status: state.appStatus
                   , onSeek:
                       case _ of
                         0.0 -> dispatch S.StopAudio
                         _ -> dispatch S.PauseAudio
+                  , onReady: dispatch S.FinishLoading
                   , onFinish: dispatch S.StopAudio
                   , onRegionFinish: dispatch S.StopAudio
                   }

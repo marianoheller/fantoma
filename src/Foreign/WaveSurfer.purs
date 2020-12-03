@@ -42,5 +42,8 @@ onFinish = on "finish"
 onPause :: (Unit -> Effect Unit) -> WaveSurfer -> Effect Unit
 onPause = on "pause"
 
+onReady :: (Unit -> Effect Unit) -> WaveSurfer -> Effect Unit
+onReady = on "ready"
+
 onRegionFinish :: (Unit -> Effect Unit) -> WaveSurfer -> Effect Unit
 onRegionFinish = on "region-out"
