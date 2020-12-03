@@ -36,14 +36,14 @@ foreign import minPxPerSec :: WaveSurfer -> Number
 onSeek :: (Number -> Effect Unit) -> WaveSurfer -> Effect Unit
 onSeek = on "seek"
 
-onFinish :: (Unit -> Effect Unit) -> WaveSurfer -> Effect Unit
-onFinish = on "finish"
+onFinish :: Effect Unit -> WaveSurfer -> Effect Unit
+onFinish cb = on "finish" \_ -> cb
 
 onPause :: (Unit -> Effect Unit) -> WaveSurfer -> Effect Unit
 onPause = on "pause"
 
-onReady :: (Unit -> Effect Unit) -> WaveSurfer -> Effect Unit
-onReady = on "ready"
+onReady :: Effect Unit -> WaveSurfer -> Effect Unit
+onReady cb = on "ready" \_ -> cb
 
-onRegionFinish :: (Unit -> Effect Unit) -> WaveSurfer -> Effect Unit
-onRegionFinish = on "region-out"
+onRegionFinish :: Effect Unit -> WaveSurfer -> Effect Unit
+onRegionFinish cb = on "region-out" \_ -> cb

@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "clean": "rm -rf .cache & rm -rf .spago",
     "build": "spago build",
     "build:watch": "spago build --watch",
     "serve:watch": "parcel public/index.html --open",
