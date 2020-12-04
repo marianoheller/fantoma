@@ -90,7 +90,7 @@ exports.on = function (event) {
   };
 };
 
-exports.setZoom = function (n) {
+exports.zoom = function (n) {
   return function (ws) {
     return function () {
       ws.zoom(n);
@@ -100,4 +100,12 @@ exports.setZoom = function (n) {
 
 exports.minPxPerSec = function (ws) {
   return ws.params.minPxPerSec;
+};
+
+exports.setCursorColor = function (color) {
+  return function (ws) {
+    return function () {
+      ws.setCursorColor(color);
+    };
+  };
 };

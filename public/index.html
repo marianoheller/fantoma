@@ -2,11 +2,24 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>ClockReactHooks</title>
+    <style>
+      body {
+        touch-action: none;
+      }
+    </style>
   </head>
-
   <body>
     <div id="root"></div>
     <script src="./index.js"></script>
+    <script>
+      document.body.addEventListener("wheel", (e) => {
+        if (e.ctrlKey) event.preventDefault(); //prevent zoom
+      });
+    </script>
   </body>
 </html>

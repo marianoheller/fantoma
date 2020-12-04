@@ -15,6 +15,7 @@ You can edit this file as you like.
   , "react-basic-hooks"
   , "generics-rep"
   , "profunctor-lenses"
+  , "web-uievents"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs" ]
