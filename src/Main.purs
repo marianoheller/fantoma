@@ -8,7 +8,7 @@ import Effect.Exception (throw)
 import React.Basic.DOM (render)
 import React.Basic.Hooks (Component, component, fragment, useContext, (/\))
 import React.Basic.Hooks as React
-import Slice (AppState(..), getIsLoading)
+import Slice (AppState(..), selectIsLoading)
 import Store (storeContext, mkStoreProvider)
 import Views.Home (mkHomeView)
 import Views.Initial (mkInitialView)
@@ -29,7 +29,7 @@ mkApp = do
           [ case appState of
               NotInitialized -> initialView unit
               Initialized _ -> homeView unit
-          , spinner { isLoading: getIsLoading appState }
+          , spinner { isLoading: selectIsLoading appState }
           ]
 
 mkWrappedApp :: Component Unit

@@ -1,6 +1,8 @@
 module Slice where
 
 import Prelude
+
+import Data.Foldable (and, or)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Lens (Lens', Prism', lens', preview, prism')
@@ -120,10 +122,30 @@ _Status =
         Idle -> Nothing
         Nidle a -> Just a
 
--- Helpers
-getIsLoading :: AppState -> Boolean
-getIsLoading s =
-  let
-    optic = _InternalState <<< _AppStatus <<< _Status
-  in
-    preview optic s == Just Loading
+-- Selectors
+getStatus :: AppState -> Maybe Status
+getStatus = preview (_InternalState <<< _AppStatus <<< _Status)
+
+selectIsIdle :: AppState -> Boolean
+selectIsIdle = (eq (Just Idle)) <<< preview (_InternalState <<< _AppStatus)
+
+selectIsNidle :: AppState -> Boolean
+selectIsNidle = not <<< selectIsIdle
+
+selectIsLoading :: AppState -> Boolean
+selectIsLoading = (eq (Just Loading)) <<< getStatus
+
+selectIsAudioPlaying :: AppState -> Boolean
+selectIsAudioPlaying = (eq (Just AudioPlaying)) <<< getStatus
+
+selectIsVoicePlaying :: AppState -> Boolean
+selectIsVoicePlaying = (eq (Just VoicePlaying)) <<< getStatus
+
+selectIsVoiceRecording :: AppState -> Boolean
+selectIsVoiceRecording = (eq (Just VoicePlaying)) <<< getStatus
+
+selectIsAudioControlDisabled :: AppState -> Boolean
+selectIsAudioControlDisabled = and <<< flap [ not <<< selectIsAudioPlaying, selectIsNidle ]
+
+selectIsRecordingDisabled :: AppState -> Boolean
+selectIsRecordingDisabled = and <<< flap [ not <<< selectIsVoicePlaying, not <<< selectIsVoiceRecording, selectIsNidle ]

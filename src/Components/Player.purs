@@ -1,6 +1,6 @@
 module Components.Player where
 
-import Prelude
+import Prelude hiding (max)
 import Data.Foldable (for_)
 import Data.Maybe (Maybe(..))
 import Data.Nullable (notNull, null)
@@ -65,10 +65,10 @@ mkPlayer = do
       pure do
         mws <- readRefMaybe wsRef
         for_ mws \ws -> WS.destroy ws
-    -- zoom
-    useEffect pxPerSec do
+    -- zoom disabled, just using it to set "default zoom"
+    useEffect minPxPerSec do
       mws <- readRefMaybe wsRef
-      for_ mws (WS.zoom pxPerSec)
+      for_ mws (WS.zoom minPxPerSec)
       pure $ pure unit
     -- on url change
     useEffect murl do
@@ -76,6 +76,7 @@ mkPlayer = do
       case mws /\ murl of
         Just ws /\ Just url -> do
           WS.load url ws
+          WS.clearRegions ws
           pure (pure unit)
         _ -> pure (pure unit)
     -- on player status change

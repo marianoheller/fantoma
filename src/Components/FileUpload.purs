@@ -17,11 +17,13 @@ import Web.HTML.HTMLElement (click, fromNode)
 import Web.HTML.HTMLInputElement as HTMLInputElement
 
 type FileUploadProps
-  = { onFileUpload :: Maybe String -> Effect Unit }
+  = { onFileUpload :: Maybe String -> Effect Unit
+    , disabled :: Boolean
+    }
 
 mkFileUpload :: Component FileUploadProps
 mkFileUpload = do
-  component "FileUploadComponent" \{ onFileUpload } -> React.do
+  component "FileUploadComponent" \{ onFileUpload, disabled } -> React.do
     inputRef <- useRef null
     let
       _onFileUpload = onFileUpload <<< Just
@@ -46,5 +48,6 @@ mkFileUpload = do
           , DOM.button
               { onClick: handler currentTarget handleButtonClick
               , children: [ DOM.text "Load file" ]
+              , disabled
               }
           ]

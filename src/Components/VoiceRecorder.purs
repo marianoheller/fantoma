@@ -2,6 +2,7 @@ module Components.VoiceRecorder (mkVoiceRecorder) where
 
 import Prelude
 
+import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Hooks.AudioPlayback (useAudioPlayback)
 import Hooks.VoiceRecorder (useVoiceRecorder)
@@ -14,11 +15,12 @@ import React.Basic.Hooks as React
 type VoiceRecorderProps
   = { onRecordingFinish :: String -> Effect Unit
     , onRecordingStart :: Effect Unit
+    , disabled :: Boolean
     }
 
 mkVoiceRecorder :: Component VoiceRecorderProps
 mkVoiceRecorder =
-  component "VoiceRecorder" \_ -> React.do
+  component "VoiceRecorder" \{ onRecordingStart, onRecordingFinish, disabled } -> React.do
     { mUrl: mUrlVoice, isRecording, start: starRecording, stop: stopRecording } <- useVoiceRecorder
     { mUrl: mUrlAudio, isPlaying, start: startPlaying, stop: stopPlaying, setMUrl: setAudioMUrl } <- useAudioPlayback
     useEffect mUrlVoice do
@@ -37,11 +39,11 @@ mkVoiceRecorder =
           [ DOM.button
               { onClick: handler currentTarget (\_ -> actionR)
               , children: [ DOM.text labelR ]
-              , disabled: isPlaying
+              , disabled: disabled || isPlaying
               }
           , DOM.button
               { onClick: handler currentTarget (\_ -> actionA)
               , children: [ DOM.text labelA ]
-              , disabled: isRecording
+              , disabled: disabled || isRecording || mUrlVoice == Nothing
               }
           ]

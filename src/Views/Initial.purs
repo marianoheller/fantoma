@@ -19,5 +19,6 @@ mkInitialView = do
           [ DOM.text "Initial view"
           , fileUpload
               { onFileUpload: dispatch <<< S.SetAudioUrl
+              , disabled: false
               }
           ]

@@ -35,6 +35,8 @@ foreign import minPxPerSec :: WaveSurfer -> Number
 
 foreign import setCursorColor :: String -> WaveSurfer -> Effect Unit
 
+foreign import clearRegions :: WaveSurfer -> Effect Unit
+
 onSeek :: (Number -> Effect Unit) -> WaveSurfer -> Effect Unit
 onSeek = on "seek"
 
@@ -49,3 +51,5 @@ onReady cb = on "ready" \_ -> cb
 
 onRegionFinish :: Effect Unit -> WaveSurfer -> Effect Unit
 onRegionFinish cb = on "region-out" \_ -> cb
+
+

@@ -13,11 +13,12 @@ import Web.HTML.HTMLInputElement as HTMLInputElement
 type PlaybackOptionsProps
   = { currentValue :: S.PlaybackOption
     , onChange :: S.PlaybackOption -> Effect Unit
+    , disabled :: Boolean
     }
 
 mkPlaybackOptions :: Component PlaybackOptionsProps
 mkPlaybackOptions = do
-  component "PlaybackOptions" \{ currentValue, onChange } -> React.do
+  component "PlaybackOptions" \{ currentValue, onChange, disabled } -> React.do
     let
       vals = [ S.PlaybackVoice, S.PlaybackAudio ]
 
@@ -35,6 +36,7 @@ mkPlaybackOptions = do
                       , name: show v
                       , checked: v == currentValue
                       , onClick: handler currentTarget $ handleChange v
+                      , disabled
                       }
                   , DOM.text $ show v
                   ]

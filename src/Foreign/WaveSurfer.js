@@ -109,3 +109,9 @@ exports.setCursorColor = function (color) {
     };
   };
 };
+
+exports.clearRegions = function (ws) {
+  return function () {
+    ws.clearRegions();
+  };
+};
