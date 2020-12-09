@@ -2,7 +2,7 @@ module Slice where
 
 import Prelude
 
-import Data.Foldable (and, or)
+import Data.Foldable (and)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Lens (Lens', Prism', lens', preview, prism')
@@ -81,6 +81,10 @@ data AppAction
   | PlayAudio
   | StopAudio
   | PauseAudio
+  | StartRecording
+  | StopRecording
+  | PlayVoice
+  | StopVoice
   | SetPlaybackOption PlaybackOption
 
 derive instance genericAppAction :: Generic AppAction _
@@ -101,6 +105,10 @@ reducer (Initialized state) action =
         FinishLoading -> state { appStatus = Idle }
         PlayAudio -> state { appStatus = Nidle AudioPlaying }
         StopAudio -> state { appStatus = Idle }
+        PlayVoice -> state { appStatus = Nidle VoicePlaying }
+        StopVoice -> state { appStatus = Idle }
+        StartRecording -> state { appStatus = Nidle VoiceRecording }
+        StopRecording -> state { appStatus = Idle }
         PauseAudio -> state { appStatus = Nidle AudioPaused }
         SetPlaybackOption option -> state { playbackOption = option }
 
@@ -142,7 +150,7 @@ selectIsVoicePlaying :: AppState -> Boolean
 selectIsVoicePlaying = (eq (Just VoicePlaying)) <<< getStatus
 
 selectIsVoiceRecording :: AppState -> Boolean
-selectIsVoiceRecording = (eq (Just VoicePlaying)) <<< getStatus
+selectIsVoiceRecording = (eq (Just VoiceRecording)) <<< getStatus
 
 selectIsAudioControlDisabled :: AppState -> Boolean
 selectIsAudioControlDisabled = and <<< flap [ not <<< selectIsAudioPlaying, selectIsNidle ]

@@ -7,7 +7,6 @@ import Components.FileUpload (mkFileUpload)
 import Components.PlaybackOptions (mkPlaybackOptions)
 import Components.Player (mkPlayer)
 import Components.VoiceRecorder (mkVoiceRecorder)
-import Effect.Class.Console (warn)
 import React.Basic.DOM as DOM
 import React.Basic.Hooks (Component, component, empty, useContext, (/\))
 import React.Basic.Hooks as React
@@ -55,8 +54,8 @@ mkHomeView = do
                   , disabled: S.selectIsIdle appState
                   }
               , voiceRecorder
-                  { onRecordingStart: pure unit
-                  , onRecordingFinish: \str -> warn $ "GOT BLOB" <> str
+                  { onRecordingStart: dispatch S.StartRecording
+                  , onRecordingFinish: dispatch S.StopRecording
                   , disabled: S.selectIsRecordingDisabled appState
                   }
               ]

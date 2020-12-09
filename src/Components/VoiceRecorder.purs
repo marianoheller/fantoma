@@ -1,7 +1,6 @@
 module Components.VoiceRecorder (mkVoiceRecorder) where
 
 import Prelude
-
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
 import Hooks.AudioPlayback (useAudioPlayback)
@@ -13,7 +12,7 @@ import React.Basic.Hooks (Component, component, useEffect, (/\))
 import React.Basic.Hooks as React
 
 type VoiceRecorderProps
-  = { onRecordingFinish :: String -> Effect Unit
+  = { onRecordingFinish :: Effect Unit
     , onRecordingStart :: Effect Unit
     , disabled :: Boolean
     }
@@ -28,8 +27,8 @@ mkVoiceRecorder =
       pure $ pure unit
     let
       actionR /\ labelR = case isRecording of
-        true -> stopRecording /\ "Stop Recording"
-        false -> starRecording /\ "Start Recording"
+        true -> (stopRecording <> onRecordingFinish) /\ "Stop Recording"
+        false -> (starRecording <> onRecordingStart) /\ "Start Recording"
 
       actionA /\ labelA = case isPlaying of
         true -> stopPlaying /\ "Stop Playing"
