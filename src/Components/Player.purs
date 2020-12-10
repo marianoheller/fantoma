@@ -91,9 +91,6 @@ mkPlayer = do
           WS.stop ws
           WS.setCursorColor "rgba(0,0,0,0)" ws
           pure (pure unit)
-        Just ws /\ S.Nidle S.AudioPaused -> do
-          WS.pause ws
-          pure (pure unit)
         _ -> pure (pure unit)
     pure
       $ DOM.div

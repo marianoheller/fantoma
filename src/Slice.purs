@@ -2,7 +2,7 @@ module Slice where
 
 import Prelude
 
-import Data.Foldable (and)
+import Data.Foldable (or)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
 import Data.Lens (Lens', Prism', lens', preview, prism')
@@ -52,7 +52,6 @@ derive instance eqAppStatus :: Eq AppStatus
 
 data Status
   = AudioPlaying
-  | AudioPaused
   | VoiceRecording
   | VoicePlaying
   | Loading
@@ -80,7 +79,6 @@ data AppAction
   | FinishLoading
   | PlayAudio
   | StopAudio
-  | PauseAudio
   | StartRecording
   | StopRecording
   | PlayVoice
@@ -109,7 +107,6 @@ reducer (Initialized state) action =
         StopVoice -> state { appStatus = Idle }
         StartRecording -> state { appStatus = Nidle VoiceRecording }
         StopRecording -> state { appStatus = Idle }
-        PauseAudio -> state { appStatus = Nidle AudioPaused }
         SetPlaybackOption option -> state { playbackOption = option }
 
 -- Optics
@@ -152,8 +149,14 @@ selectIsVoicePlaying = (eq (Just VoicePlaying)) <<< getStatus
 selectIsVoiceRecording :: AppState -> Boolean
 selectIsVoiceRecording = (eq (Just VoiceRecording)) <<< getStatus
 
+selectIsAudioControlEnabled :: AppState -> Boolean
+selectIsAudioControlEnabled = or <<< flap [ selectIsAudioPlaying, selectIsIdle ]
+
 selectIsAudioControlDisabled :: AppState -> Boolean
-selectIsAudioControlDisabled = and <<< flap [ not <<< selectIsAudioPlaying, selectIsNidle ]
+selectIsAudioControlDisabled = not <<< selectIsAudioControlEnabled
+
+selectIsRecordingEnabled :: AppState -> Boolean
+selectIsRecordingEnabled = or <<< flap [ selectIsVoicePlaying, selectIsVoiceRecording, selectIsIdle ]
 
 selectIsRecordingDisabled :: AppState -> Boolean
-selectIsRecordingDisabled = and <<< flap [ not <<< selectIsVoicePlaying, not <<< selectIsVoiceRecording, selectIsNidle ]
+selectIsRecordingDisabled = not <<< selectIsRecordingEnabled

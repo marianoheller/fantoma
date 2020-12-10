@@ -1,7 +1,6 @@
 module Views.Home where
 
 import Prelude
-
 import Components.Controls (mkControls)
 import Components.FileUpload (mkFileUpload)
 import Components.PlaybackOptions (mkPlaybackOptions)
@@ -30,10 +29,7 @@ mkHomeView = do
               [ player
                   { murl: state.audioUrl
                   , status: state.appStatus
-                  , onSeek:
-                      case _ of
-                        0.0 -> dispatch S.StopAudio
-                        _ -> dispatch S.PauseAudio
+                  , onSeek: \_ -> dispatch S.StopAudio
                   , onReady: dispatch S.FinishLoading
                   , onFinish: dispatch S.StopAudio
                   , onRegionFinish: dispatch S.StopAudio
@@ -51,11 +47,13 @@ mkHomeView = do
               , playbackOptions
                   { onChange: dispatch <<< S.SetPlaybackOption
                   , currentValue: state.playbackOption
-                  , disabled: S.selectIsIdle appState
+                  , disabled: S.selectIsNidle appState
                   }
               , voiceRecorder
                   { onRecordingStart: dispatch S.StartRecording
                   , onRecordingFinish: dispatch S.StopRecording
+                  , onVoicePlay: dispatch S.PlayVoice
+                  , onVoiceStop: dispatch S.StopVoice
                   , disabled: S.selectIsRecordingDisabled appState
                   }
               ]
