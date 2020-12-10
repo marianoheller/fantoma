@@ -11,7 +11,7 @@
     "build": "spago build",
     "build:watch": "spago build --watch",
     "serve:watch": "parcel public/index.html --open",
-    "dev": "npm run clean && concurrently --kill-others \"npm run build:watch\" \"npm run serve:watch\"",
+    "dev": "concurrently --kill-others \"npm run build:watch\" \"npm run serve:watch\"",
     "build-prod": "mkdir -p prod && cp public/index.html prod/ && rm -rf dist && spago bundle-app --to prod/index.js && parcel build prod/index.html",
     "test": "spago -x spago.test.dhall test"
   },

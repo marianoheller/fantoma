@@ -59,6 +59,8 @@ reducer =
         StopPlaying -> s { status = Stopped }
         SetMUrl murl -> s { murl = murl }
 
+type OnAudioStop = Effect Unit
+
 type VoiceRecorderStuff
   = { mUrl :: Maybe String
     , start :: Effect Unit
@@ -72,8 +74,8 @@ newtype UseAudioPlayback hooks
 
 derive instance ntUseAudioPlayback :: Newtype (UseAudioPlayback hooks) _
 
-useAudioPlayback :: Hook UseAudioPlayback VoiceRecorderStuff
-useAudioPlayback =
+useAudioPlayback :: OnAudioStop -> Hook UseAudioPlayback VoiceRecorderStuff
+useAudioPlayback onAudioStop =
   coerceHook React.do
     audioRef <- useRef null
     state /\ dispatch <- useReducer initialLocalState reducer
@@ -87,7 +89,7 @@ useAudioPlayback =
     useEffect state.status do
       case state.status of
         Playing -> (traverse_ MediaElement.play) =<< getMediaElement audioRef
-        Stopped -> (traverse_ stop) =<< getMediaElement audioRef
+        Stopped -> ((traverse_ stop) =<< getMediaElement audioRef) <> onAudioStop
       pure $ pure unit
     pure
       { mUrl: state.murl

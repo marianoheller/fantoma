@@ -1,6 +1,7 @@
 module Components.Player where
 
 import Prelude hiding (max)
+
 import Data.Foldable (for_)
 import Data.Maybe (Maybe(..))
 import Data.Nullable (notNull, null)

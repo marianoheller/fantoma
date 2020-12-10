@@ -1,11 +1,13 @@
 module Views.Home where
 
 import Prelude
+
 import Components.Controls (mkControls)
 import Components.FileUpload (mkFileUpload)
 import Components.PlaybackOptions (mkPlaybackOptions)
 import Components.Player (mkPlayer)
 import Components.VoiceRecorder (mkVoiceRecorder)
+import Effect.Class.Console (warn)
 import React.Basic.DOM as DOM
 import React.Basic.Hooks (Component, component, empty, useContext, (/\))
 import React.Basic.Hooks as React
@@ -32,7 +34,7 @@ mkHomeView = do
                   , onSeek: \_ -> dispatch S.StopAudio
                   , onReady: dispatch S.FinishLoading
                   , onFinish: dispatch S.StopAudio
-                  , onRegionFinish: dispatch S.StopAudio
+                  , onRegionFinish: (dispatch S.StopAudio) <> warn "REGION FINISH" 
                   }
               , fileUpload
                   { onFileUpload: dispatch <<< S.SetAudioUrl
@@ -52,8 +54,8 @@ mkHomeView = do
               , voiceRecorder
                   { onRecordingStart: dispatch S.StartRecording
                   , onRecordingFinish: dispatch S.StopRecording
-                  , onVoicePlay: dispatch S.PlayVoice
-                  , onVoiceStop: dispatch S.StopVoice
+                  , onVoiceStart: dispatch S.PlayVoice
+                  , onVoiceFinish: dispatch S.StopVoice
                   , disabled: S.selectIsRecordingDisabled appState
                   }
               ]
