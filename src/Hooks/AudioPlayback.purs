@@ -59,7 +59,8 @@ reducer =
         StopPlaying -> s { status = Stopped }
         SetMUrl murl -> s { murl = murl }
 
-type OnAudioStop = Effect Unit
+type OnAudioStop
+  = Effect Unit
 
 type VoiceRecorderStuff
   = { mUrl :: Maybe String
@@ -81,7 +82,7 @@ useAudioPlayback onAudioStop =
     state /\ dispatch <- useReducer initialLocalState reducer
     useEffect state.murl do
       initializeAudioElement audioRef dispatch
-      mElem <- ((=<<) E.fromNode) <$> (readRefMaybe audioRef)
+      mElem <- ((=<<) E.fromNode) <$> (readRefMaybe audioRef) -- better way to do this? (Bind g => Functor f => (a -> g b) -> f (g a) -> f (g b))
       for_ mElem \elem -> do
         for_ state.murl \url -> do
           E.setAttribute "src" url elem
@@ -123,9 +124,7 @@ initializeAudioElement audioRef dispatch = do
 getMediaElement :: Ref (Nullable Node) -> Effect (Maybe HTMLMediaElement)
 getMediaElement audioRef = do
   mElem <- ((=<<) HE.fromNode) <$> (readRefMaybe audioRef)
-  case AudioElement.toHTMLMediaElement <$> (AudioElement.fromHTMLElement =<< mElem) of
-    Nothing -> pure Nothing
-    Just mediaElement -> pure $ Just mediaElement
+  pure $ AudioElement.toHTMLMediaElement <$> (AudioElement.fromHTMLElement =<< mElem)
 
 stop :: HTMLMediaElement -> Effect Unit
 stop = sequence_ <<< flap [ MediaElement.pause, MediaElement.setCurrentTime 0.0 ]
