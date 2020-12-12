@@ -1,7 +1,6 @@
 module Hooks.VoiceRecorder where
 
 import Prelude
-
 import Data.Array (reverse, (:))
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
@@ -64,7 +63,6 @@ newtype UseVoiceRecorder hooks
 
 derive instance ntUseVoiceRecorder :: Newtype (UseVoiceRecorder hooks) _
 
--- TODO: Fix all liftEffects and use useEffect AND useAff
 useVoiceRecorder :: Hook UseVoiceRecorder VoiceRecorderStuff
 useVoiceRecorder =
   coerceHook React.do
@@ -73,12 +71,14 @@ useVoiceRecorder =
       case state.status /\ state.mmr of
         Recording /\ _ -> do
           mr <- MR.newMediaRecorder <$> (MS.getUserMedia MS.audioOnly)
-          liftEffect $ MR.onDataAvailable (dispatch <<< OnData) mr
-          liftEffect $ MR.start 100 mr
-          liftEffect $ dispatch $ SetMediaRecorder $ Just mr
+          liftEffect do
+            MR.onDataAvailable (dispatch <<< OnData) mr
+            MR.start 100 mr
+            dispatch $ SetMediaRecorder $ Just mr
         Stopping /\ Just mr -> do
-          liftEffect $ MR.stop mr
-          liftEffect $ dispatch SetIdle
+          liftEffect do
+            MR.stop mr
+            dispatch SetIdle
         Idle /\ Just mr -> do
           url <- liftEffect <<< createObjectURLFromBlobs <<< reverse $ state.chunks
           liftEffect $ dispatch $ CleanUp url
