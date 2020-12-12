@@ -1,7 +1,6 @@
 module Slice where
 
 import Prelude
-
 import Data.Foldable (or)
 import Data.Generic.Rep (class Generic)
 import Data.Generic.Rep.Show (genericShow)
@@ -104,7 +103,10 @@ reducer (Initialized state) action =
         PlayAudio -> state { appStatus = Nidle AudioPlaying }
         StopAudio -> state { appStatus = Idle }
         PlayVoice -> state { appStatus = Nidle VoicePlaying }
-        StopVoice -> state { appStatus = Idle }
+        StopVoice -> case preview _PlaybackOption $ state of
+          Just PlaybackVoice -> state { appStatus = Nidle VoicePlaying }
+          Just PlaybackAudio -> state { appStatus = Nidle AudioPlaying }
+          _ -> state { appStatus = Idle }
         StartRecording -> state { appStatus = Nidle VoiceRecording }
         StopRecording -> state { appStatus = Idle }
         SetPlaybackOption option -> state { playbackOption = option }
@@ -126,6 +128,9 @@ _Status =
     $ case _ of
         Idle -> Nothing
         Nidle a -> Just a
+
+_PlaybackOption :: forall r. Lens' { playbackOption :: PlaybackOption | r } PlaybackOption
+_PlaybackOption = lens' \record -> Tuple record.playbackOption (\s -> record { playbackOption = s })
 
 -- Selectors
 getStatus :: AppState -> Maybe Status
