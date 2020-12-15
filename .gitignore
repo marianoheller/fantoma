@@ -11,4 +11,5 @@
 /.cache
 /dist
 /data
+/prod
 /.vscode
