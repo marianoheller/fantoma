@@ -104,11 +104,12 @@ reducer (Initialized state) action =
         StopAudio -> state { appStatus = Idle }
         PlayVoice -> state { appStatus = Nidle VoicePlaying }
         StopVoice -> case preview _PlaybackOption $ state of
-          Just PlaybackVoice -> state { appStatus = Nidle VoicePlaying }
           Just PlaybackAudio -> state { appStatus = Nidle AudioPlaying }
           _ -> state { appStatus = Idle }
         StartRecording -> state { appStatus = Nidle VoiceRecording }
-        StopRecording -> state { appStatus = Idle }
+        StopRecording -> case preview _PlaybackOption $ state of
+          Just PlaybackVoice -> state { appStatus = Nidle VoicePlaying }
+          _ -> state { appStatus = Idle }
         SetPlaybackOption option -> state { playbackOption = option }
 
 -- Optics

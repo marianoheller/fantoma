@@ -1,7 +1,6 @@
 module Components.Player where
 
 import Prelude hiding (max)
-
 import Data.Foldable (for_)
 import Data.Maybe (Maybe(..))
 import Data.Nullable (notNull, null)
@@ -97,4 +96,5 @@ mkPlayer = do
       $ DOM.div
           { ref: divRef
           , onWheel: handler (stopPropagation >>> targetWheelEvent) $ deltaY >>> calcZoom >>> setPxPerSec
+          , style: DOM.css { width: "100%" }
           }

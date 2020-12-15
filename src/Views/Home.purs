@@ -1,18 +1,30 @@
 module Views.Home where
 
 import Prelude
-
 import Components.Controls (mkControls)
 import Components.FileUpload (mkFileUpload)
 import Components.PlaybackOptions (mkPlaybackOptions)
 import Components.Player (mkPlayer)
 import Components.VoiceRecorder (mkVoiceRecorder)
-import Effect.Class.Console (warn)
 import React.Basic.DOM as DOM
-import React.Basic.Hooks (Component, component, empty, useContext, (/\))
+import React.Basic.Hooks (Component, JSX, component, empty, useContext, (/\))
 import React.Basic.Hooks as React
 import Slice as S
 import Store (storeContext)
+
+styledContainer :: Array JSX -> JSX
+styledContainer children =
+  DOM.div
+    { style:
+        DOM.css
+          { width: "100%"
+          , display: "flex"
+          , flexDirection: "column"
+          , justifyContent: "center"
+          , alignItems: "center"
+          }
+    , children
+    }
 
 mkHomeView :: Component Unit
 mkHomeView = do
@@ -27,14 +39,14 @@ mkHomeView = do
       $ case appState of
           S.NotInitialized -> empty
           S.Initialized state ->
-            DOM.div_
+            styledContainer
               [ player
                   { murl: state.audioUrl
                   , status: state.appStatus
                   , onSeek: \_ -> dispatch S.StopAudio
                   , onReady: dispatch S.FinishLoading
                   , onFinish: dispatch S.StopAudio
-                  , onRegionFinish: (dispatch S.StopAudio) <> warn "REGION FINISH" 
+                  , onRegionFinish: dispatch S.StopAudio
                   }
               , fileUpload
                   { onFileUpload: dispatch <<< S.SetAudioUrl

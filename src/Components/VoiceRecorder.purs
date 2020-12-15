@@ -1,8 +1,11 @@
 module Components.VoiceRecorder (mkVoiceRecorder) where
 
 import Prelude
+
+import Data.Foldable (for_)
 import Data.Maybe (Maybe(..))
 import Effect (Effect)
+import Effect.Class.Console (warn)
 import Hooks.AudioPlayback (useAudioPlayback)
 import Hooks.VoiceRecorder (useVoiceRecorder)
 import React.Basic.DOM as DOM
@@ -26,10 +29,11 @@ mkVoiceRecorder =
     { mUrl: mUrlAudio, isPlaying, start: startPlaying, stop: stopPlaying, setMUrl: setAudioMUrl } <- useAudioPlayback onVoiceFinish
     useEffect mUrlVoice do
       setAudioMUrl mUrlVoice
+      for_ mUrlVoice \_ -> onRecordingFinish
       pure $ pure unit
     let
       actionR /\ labelR = case isRecording of
-        true -> (stopRecording <> onRecordingFinish) /\ "Stop Recording"
+        true -> stopRecording /\ "Stop Recording"
         false -> (starRecording <> onRecordingStart) /\ "Start Recording"
 
       actionA /\ labelA = case isPlaying of
